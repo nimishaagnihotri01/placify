@@ -1,0 +1,73 @@
+export const placementDrives = [
+  {
+    id: 1,
+    company: 'Infosys',
+    role: 'Systems Engineer',
+    deadline: '2026-06-12',
+    testDate: '2026-06-15',
+    interviewDate: '2026-06-20',
+    status: 'Applied',
+    notes: 'Revise aptitude and DBMS basics.',
+  },
+  {
+    id: 2,
+    company: 'TCS Digital',
+    role: 'Software Developer',
+    deadline: '2026-06-10',
+    testDate: '2026-06-18',
+    interviewDate: '2026-06-24',
+    status: 'Test Scheduled',
+    notes: 'Practice coding rounds and email confirmation.',
+  },
+  {
+    id: 3,
+    company: 'Accenture',
+    role: 'Associate Software Engineer',
+    deadline: '2026-06-14',
+    testDate: '2026-06-21',
+    interviewDate: '2026-06-27',
+    status: 'Deadline Soon',
+    notes: 'Upload latest resume before registration closes.',
+  },
+  {
+    id: 4,
+    company: 'Deloitte',
+    role: 'Technology Analyst',
+    deadline: '2026-06-17',
+    testDate: '2026-06-22',
+    interviewDate: '2026-06-29',
+    status: 'Interview Prep',
+    notes: 'Prepare project walkthrough and HR answers.',
+  },
+]
+
+export const calendarEvents = [
+  {
+    id: 1,
+    date: 'Jun 10',
+    title: 'TCS Digital registration closes',
+    type: 'Deadline',
+    accent: 'bg-rose-500',
+  },
+  {
+    id: 2,
+    date: 'Jun 15',
+    title: 'Infosys online assessment',
+    type: 'Test',
+    accent: 'bg-teal-600',
+  },
+  {
+    id: 3,
+    date: 'Jun 20',
+    title: 'Infosys technical interview',
+    type: 'Interview',
+    accent: 'bg-amber-500',
+  },
+  {
+    id: 4,
+    date: 'Jun 24',
+    title: 'TCS Digital interview round',
+    type: 'Interview',
+    accent: 'bg-indigo-500',
+  },
+]
