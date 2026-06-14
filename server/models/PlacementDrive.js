@@ -41,6 +41,11 @@ const placementDriveSchema = new mongoose.Schema({
     trim: true,
     default: '',
   },
+  location: {
+    type: String,
+    trim: true,
+    default: '',
+  },
   notes: {
     type: String,
     trim: true,

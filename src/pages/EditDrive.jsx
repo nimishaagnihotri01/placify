@@ -2,6 +2,8 @@ import { ArrowLeft, Save } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import Button from '../components/common/Button.jsx'
+import Card from '../components/common/Card.jsx'
+import LoadingState from '../components/common/LoadingState.jsx'
 import PageHeader from '../components/dashboard/PageHeader.jsx'
 import { DRIVE_STATUSES } from '../constants/driveStatus.js'
 import { getDriveById, updateDrive } from '../services/driveService.js'
@@ -19,6 +21,7 @@ const fields = [
   { id: 'testDate', label: 'Test Date', type: 'date' },
   { id: 'interviewDate', label: 'Interview Date', type: 'date' },
   { id: 'packageCtc', label: 'Package/CTC', type: 'text' },
+  { id: 'location', label: 'Location', type: 'text' },
 ]
 
 const emptyForm = {
@@ -29,6 +32,7 @@ const emptyForm = {
   interviewDate: '',
   eligibilityCriteria: '',
   packageCtc: '',
+  location: '',
   status: 'Applied',
   notes: '',
 }
@@ -42,6 +46,7 @@ function mapDriveToForm(drive) {
     interviewDate: toDateInputValue(drive.interviewDate),
     eligibilityCriteria: drive.eligibilityCriteria || '',
     packageCtc: drive.packageCtc || '',
+    location: drive.location || '',
     status: drive.status || 'Applied',
     notes: drive.notes || '',
   }
@@ -141,9 +146,7 @@ export default function EditDrive() {
       />
 
       {isLoading && (
-        <div className="rounded-lg border border-slate-200 bg-white px-5 py-8 text-sm font-semibold text-slate-500 shadow-sm">
-          Loading placement drive...
-        </div>
+        <LoadingState rows={4} title="Loading placement drive" />
       )}
 
       {!isLoading && pageError && (
@@ -153,10 +156,19 @@ export default function EditDrive() {
       )}
 
       {!isLoading && !pageError && (
-        <form
+        <Card
+          as="form"
           onSubmit={handleSubmit}
-          className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+          className="p-5 sm:p-6"
         >
+          <div className="mb-6 rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-3">
+            <p className="text-sm font-bold text-indigo-950">Update drive details</p>
+            <p className="mt-1 text-sm leading-6 text-indigo-950/70">
+              Keep the application profile, timeline, and notes accurate for
+              reminder and dashboard views.
+            </p>
+          </div>
+
           <div className="grid gap-5 md:grid-cols-2">
             {fields.map((field) => (
               <label key={field.id} className="block">
@@ -164,7 +176,11 @@ export default function EditDrive() {
                   {field.label}
                 </span>
                 <input
-                  className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+                  className={`mt-2 h-12 w-full rounded-lg border bg-white px-4 text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-4 ${
+                    errors[field.id]
+                      ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-100'
+                      : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-100'
+                  }`}
                   name={field.id}
                   onChange={updateField}
                   placeholder={field.type === 'text' ? field.label : undefined}
@@ -183,7 +199,7 @@ export default function EditDrive() {
             <label className="block">
               <span className="text-sm font-bold text-slate-700">Status</span>
               <select
-                className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-slate-900 outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+                className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
                 name="status"
                 onChange={updateField}
                 value={form.status}
@@ -201,7 +217,7 @@ export default function EditDrive() {
                 Eligibility Criteria
               </span>
               <textarea
-                className="mt-2 min-h-28 w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+                className="mt-2 min-h-28 w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
                 name="eligibilityCriteria"
                 onChange={updateField}
                 placeholder="Add branches, CGPA, backlog rules, batch, or other eligibility details."
@@ -212,7 +228,7 @@ export default function EditDrive() {
             <label className="block md:col-span-2">
               <span className="text-sm font-bold text-slate-700">Notes</span>
               <textarea
-                className="mt-2 min-h-32 w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+                className="mt-2 min-h-32 w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
                 name="notes"
                 onChange={updateField}
                 placeholder="Add preparation notes, links, eligibility details, or round-specific reminders."
@@ -238,7 +254,7 @@ export default function EditDrive() {
               </p>
             )}
           </div>
-        </form>
+        </Card>
       )}
     </>
   )

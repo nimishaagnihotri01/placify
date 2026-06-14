@@ -4,7 +4,7 @@ export function notFound(req, res, next) {
 }
 
 export function errorHandler(error, req, res, next) {
-  let statusCode = res.statusCode === 200 ? 500 : res.statusCode
+  let statusCode = error.statusCode || (res.statusCode === 200 ? 500 : res.statusCode)
   let message = error.message || 'Server error'
 
   if (error.name === 'CastError') {

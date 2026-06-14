@@ -26,10 +26,11 @@ const MONTHS = {
 }
 
 const LABELS = [
-  'company',
   'company name',
+  'company',
   'organization',
   'employer',
+  'job profile',
   'role',
   'position',
   'designation',
@@ -37,6 +38,7 @@ const LABELS = [
   'job title',
   'job role',
   'registration deadline',
+  'last registration date',
   'application deadline',
   'last date to register',
   'last date for registration',
@@ -45,22 +47,35 @@ const LABELS = [
   'apply by',
   'deadline',
   'test date',
+  'online assessment date',
   'assessment date',
   'online assessment',
   'oa date',
   'coding test',
+  'campus date & time',
+  'campus date',
   'interview date',
   'interview',
-  'eligibility',
   'eligibility criteria',
+  'eligibility',
   'eligible branches',
+  'cgpa requirements',
+  'no active backlog',
   'criteria',
   'package/ctc',
+  'package (ctc)',
   'package',
   'ctc',
   'compensation',
   'salary',
   'stipend',
+  'location',
+  'job location',
+  'work location',
+  'office location',
+  'joining location',
+  'venue',
+  'work mode',
   'notes',
   'important notes',
   'selection process',
@@ -83,6 +98,7 @@ NovaTech Labs is visiting campus for the role of Software Engineer Intern.
 Company Name: NovaTech Labs
 Role: Software Engineer Intern
 Package/CTC: 12 LPA + internship stipend of 45,000 per month
+Location: Bengaluru / Remote
 Eligibility Criteria:
 - B.Tech CSE/IT/ECE 2027 batch
 - Minimum CGPA 7.0
@@ -104,6 +120,7 @@ We are pleased to announce that BrightStack will be conducting a recruitment dri
 Eligible branches: CSE, IT, AIML, ECE
 Criteria: 70% in 10th/12th and 6.5 CGPA in degree. No current backlog.
 CTC offered: INR 8.5 LPA
+Job Location: Pune
 
 Register by: 12/06/2026
 Test: 15/06/2026
@@ -121,6 +138,7 @@ Application Deadline - June 20, 2026
 Assessment Date - June 24, 2026
 Interview - To be announced
 Compensation - 6 LPA
+Work Location - Hyderabad
 Eligibility - B.E/B.Tech/MCA, all circuit branches, CGPA 6.0 and above.
 
 Rounds: Aptitude test, SQL case study, manager interview.
@@ -142,15 +160,30 @@ function cleanLine(line) {
 function isLikelyLabel(line) {
   const cleaned = cleanLine(line).toLowerCase()
   return LABELS.some((label) =>
-    new RegExp(
-      `^${escapeRegex(label)}\\b(?:\\s+(?:offered|details|date))?\\s*(?:[:=\\-]|$)`,
-      'i',
-    ).test(cleaned),
+    getLabelMatcher([label], true).test(cleaned),
   )
 }
 
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function getAliasPattern(aliases) {
+  return aliases
+    .slice()
+    .sort((first, second) => second.length - first.length)
+    .map((alias) => escapeRegex(alias).replace(/\\ /g, '\\s+'))
+    .join('|')
+}
+
+function getLabelMatcher(aliases, allowEmptyValue = false) {
+  const aliasPattern = getAliasPattern(aliases)
+  const valuePattern = allowEmptyValue ? '(.*)$' : '(.+)$'
+
+  return new RegExp(
+    `^(?:${aliasPattern})(?:\\s*\\([^)]*\\))?(?:\\s+(?:offered|details|date|and time))?\\s*(?:[:=\\-]|&|-)\\s*${valuePattern}`,
+    'i',
+  )
 }
 
 function compactValue(value) {
@@ -162,6 +195,21 @@ function compactValue(value) {
 
 function cleanShortValue(value) {
   return compactValue(value).replace(/[.;,\s]+$/, '')
+}
+
+function cleanPackageValue(value) {
+  return cleanShortValue(
+    value
+      .replace(/^(?:offered|details|ctc|package|salary|compensation)\s*[:=-]\s*/i, '')
+      .replace(/\b(?:last registration date|registration deadline|online assessment date|test date|campus date).*/i, '')
+      .trim(),
+  )
+}
+
+function isGenericCompanyCandidate(value) {
+  return /^(?:campus drive details|campus drive|placement notice|placement cell update|placement update|drive details|recruitment drive|hiring update)$/i.test(
+    cleanShortValue(value),
+  )
 }
 
 function toDateInput(date) {
@@ -258,11 +306,7 @@ function getLines(text) {
 }
 
 function findLabeledBlock(lines, aliases, maxContinuationLines = 3) {
-  const aliasPattern = aliases.map(escapeRegex).join('|')
-  const matcher = new RegExp(
-    `^(?:${aliasPattern})(?:\\s+(?:offered|details|date))?\\s*(?:[:=\\-]|-)?\\s*(.*)$`,
-    'i',
-  )
+  const matcher = getLabelMatcher(aliases, true)
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index]
@@ -317,7 +361,7 @@ function findCompany(lines, text) {
     'employer',
   ], 0)
 
-  if (labeled) {
+  if (labeled && !isGenericCompanyCandidate(labeled)) {
     return { value: labeled, confidence: 'High' }
   }
 
@@ -329,7 +373,9 @@ function findCompany(lines, text) {
       .map((part) => part.trim())
       .filter(Boolean)
     const candidate = parts.find(
-      (part) => !/placement|opportunity|drive|hiring|recruitment/i.test(part),
+      (part) =>
+        !/placement|opportunity|drive|hiring|recruitment/i.test(part) &&
+        !isGenericCompanyCandidate(part),
     )
 
     if (candidate) {
@@ -349,16 +395,17 @@ function findCompany(lines, text) {
 
 function findRole(lines, text) {
   const labeled = findLabeledBlock(lines, [
+    'job profile',
     'role',
     'position',
     'designation',
     'profile',
     'job title',
     'job role',
-  ], 0)
+  ], 2)
 
   if (labeled) {
-    return { value: labeled, confidence: 'High' }
+    return { value: cleanShortValue(labeled), confidence: 'High' }
   }
 
   const inferred = findContextValue(text, [
@@ -396,6 +443,8 @@ function findEligibility(lines) {
   const labeled = [
     findLabeledBlock(lines, ['eligibility criteria', 'eligibility']),
     findLabeledBlock(lines, ['eligible branches'], 1),
+    findLabeledBlock(lines, ['cgpa requirements'], 1),
+    findLabeledBlock(lines, ['no active backlog'], 1),
     findLabeledBlock(lines, ['criteria'], 2),
   ]
     .filter(Boolean)
@@ -425,6 +474,7 @@ function findEligibility(lines) {
 function findPackage(lines, text) {
   const labeled = findLabeledBlock(lines, [
     'package/ctc',
+    'package (ctc)',
     'package',
     'ctc',
     'compensation',
@@ -433,7 +483,7 @@ function findPackage(lines, text) {
   ], 1)
 
   if (labeled) {
-    return { value: labeled, confidence: 'High' }
+    return { value: cleanPackageValue(labeled), confidence: 'High' }
   }
 
   const inferred = findContextValue(text, [
@@ -442,7 +492,32 @@ function findPackage(lines, text) {
   ])
 
   return inferred
-    ? { value: inferred, confidence: 'Medium' }
+    ? { value: cleanPackageValue(inferred), confidence: 'Medium' }
+    : { value: '', confidence: 'Low' }
+}
+
+function findLocation(lines, text) {
+  const labeled = findLabeledBlock(lines, [
+    'location',
+    'job location',
+    'work location',
+    'office location',
+    'joining location',
+    'venue',
+    'work mode',
+  ], 1)
+
+  if (labeled) {
+    return { value: cleanShortValue(labeled), confidence: 'High' }
+  }
+
+  const inferred = findContextValue(text, [
+    /(?:job location|work location|office location|joining location|venue|work mode)\s*(?:is|:|-)?\s*([A-Za-z0-9&/.,'() -]{3,80})/i,
+    /\b(?:based in|located in)\s+([A-Z][A-Za-z0-9&/.,'() -]{2,70})/,
+  ])
+
+  return inferred
+    ? { value: cleanShortValue(inferred), confidence: 'Medium' }
     : { value: '', confidence: 'Low' }
 }
 
@@ -474,6 +549,15 @@ function findNotes(lines) {
   return { value: '', confidence: 'Low' }
 }
 
+function splitRoleCandidates(value) {
+  return value
+    .split(/\s*(?:,|\/|\||;|\band\b|\bor\b)\s*/i)
+    .map(cleanShortValue)
+    .filter((item) => item.length >= 3)
+    .filter((item, index, items) => items.indexOf(item) === index)
+    .slice(0, 6)
+}
+
 function makeField(value, confidence) {
   return {
     value,
@@ -491,6 +575,7 @@ export function extractPlacementEmail(emailContent) {
     normalized,
     [
       'registration deadline',
+      'last registration date',
       'application deadline',
       'last date to register',
       'last date for registration',
@@ -501,7 +586,7 @@ export function extractPlacementEmail(emailContent) {
     ],
     [
       new RegExp(
-        `(?:registration closes|registration deadline|application deadline|last date to register|last date for registration|last date to apply|register by|apply by|deadline)\\s*(?:is|on|:|-)?\\s*(${DATE_PATTERN})`,
+        `(?:registration closes|registration deadline|last registration date|application deadline|last date to register|last date for registration|last date to apply|register by|apply by|deadline)\\s*(?:is|on|:|-)?\\s*(${DATE_PATTERN})`,
         'i',
       ),
     ],
@@ -509,10 +594,20 @@ export function extractPlacementEmail(emailContent) {
   const testDate = findDateField(
     lines,
     normalized,
-    ['test date', 'assessment date', 'online assessment date', 'online assessment', 'oa date', 'coding test', 'test'],
+    [
+      'test date',
+      'online assessment date',
+      'assessment date',
+      'online assessment',
+      'oa date',
+      'coding test',
+      'campus date & time',
+      'campus date',
+      'test',
+    ],
     [
       new RegExp(
-        `(?:online assessment|assessment|coding test|test|oa)\\s*(?:date|is|on|:|-)?\\s*(${DATE_PATTERN})`,
+        `(?:online assessment|assessment|coding test|campus date(?:\\s*&\\s*time)?|test|oa)\\s*(?:date|is|on|:|-)?\\s*(${DATE_PATTERN})`,
         'i',
       ),
     ],
@@ -530,6 +625,7 @@ export function extractPlacementEmail(emailContent) {
   )
   const eligibilityCriteria = findEligibility(lines)
   const packageCtc = findPackage(lines, normalized)
+  const location = findLocation(lines, normalized)
   const notes = findNotes(lines)
 
   return {
@@ -546,8 +642,23 @@ export function extractPlacementEmail(emailContent) {
       eligibilityCriteria.confidence,
     ),
     packageCtc: makeField(packageCtc.value, packageCtc.confidence),
+    location: makeField(location.value, location.confidence),
     notes: makeField(notes.value, notes.confidence),
   }
+}
+
+export function extractPlacementOpportunities(emailContent) {
+  const baseExtraction = extractPlacementEmail(emailContent)
+  const roles = splitRoleCandidates(baseExtraction.role.value)
+
+  if (roles.length <= 1) {
+    return [baseExtraction]
+  }
+
+  return roles.map((role) => ({
+    ...baseExtraction,
+    role: makeField(role, baseExtraction.role.confidence),
+  }))
 }
 
 export { SAMPLE_PLACEMENT_EMAILS }

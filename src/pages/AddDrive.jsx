@@ -2,6 +2,7 @@ import { Save } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/common/Button.jsx'
+import Card from '../components/common/Card.jsx'
 import PageHeader from '../components/dashboard/PageHeader.jsx'
 import {
   DEFAULT_DRIVE_STATUS,
@@ -17,6 +18,7 @@ const initialForm = {
   interviewDate: '',
   eligibilityCriteria: '',
   packageCtc: '',
+  location: '',
   status: DEFAULT_DRIVE_STATUS,
   notes: '',
 }
@@ -33,6 +35,7 @@ const fields = [
   { id: 'testDate', label: 'Test Date', type: 'date' },
   { id: 'interviewDate', label: 'Interview Date', type: 'date' },
   { id: 'packageCtc', label: 'Package/CTC', type: 'text' },
+  { id: 'location', label: 'Location', type: 'text' },
 ]
 
 export default function AddDrive() {
@@ -99,10 +102,19 @@ export default function AddDrive() {
         description="Save placement drive details to your Placify backend and keep the dashboard in sync."
       />
 
-      <form
+      <Card
+        as="form"
         onSubmit={handleSubmit}
-        className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+        className="p-5 sm:p-6"
       >
+        <div className="mb-6 rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-3">
+          <p className="text-sm font-bold text-indigo-950">Drive basics</p>
+          <p className="mt-1 text-sm leading-6 text-indigo-950/70">
+            Add the core company, role, schedule, and notes. Required fields are
+            marked by the browser and validated before saving.
+          </p>
+        </div>
+
         <div className="grid gap-5 md:grid-cols-2">
           {fields.map((field) => (
             <label key={field.id} className="block">
@@ -110,7 +122,11 @@ export default function AddDrive() {
                 {field.label}
               </span>
               <input
-                className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+                className={`mt-2 h-12 w-full rounded-lg border bg-white px-4 text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-4 ${
+                  errors[field.id]
+                    ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-100'
+                    : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-100'
+                }`}
                 name={field.id}
                 onChange={updateField}
                 placeholder={field.type === 'text' ? field.label : undefined}
@@ -129,7 +145,7 @@ export default function AddDrive() {
           <label className="block">
             <span className="text-sm font-bold text-slate-700">Status</span>
             <select
-              className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-slate-900 outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+              className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
               name="status"
               onChange={updateField}
               value={form.status}
@@ -147,7 +163,7 @@ export default function AddDrive() {
               Eligibility Criteria
             </span>
             <textarea
-              className="mt-2 min-h-28 w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+              className="mt-2 min-h-28 w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
               name="eligibilityCriteria"
               onChange={updateField}
               placeholder="Add branches, CGPA, backlog rules, batch, or other eligibility details."
@@ -158,7 +174,7 @@ export default function AddDrive() {
           <label className="block md:col-span-2">
             <span className="text-sm font-bold text-slate-700">Notes</span>
             <textarea
-              className="mt-2 min-h-32 w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+              className="mt-2 min-h-32 w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
               name="notes"
               onChange={updateField}
               placeholder="Add preparation notes, links, eligibility details, or round-specific reminders."
@@ -176,12 +192,12 @@ export default function AddDrive() {
             <p className="text-sm font-semibold text-rose-700">{submitError}</p>
           )}
           {saved && (
-            <p className="text-sm font-semibold text-teal-800">
+            <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800 ring-1 ring-emerald-100">
               Drive saved successfully. Redirecting to dashboard...
             </p>
           )}
         </div>
-      </form>
+      </Card>
     </>
   )
 }

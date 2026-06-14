@@ -8,6 +8,7 @@ const DRIVE_FIELDS = [
   'interviewDate',
   'eligibilityCriteria',
   'packageCtc',
+  'location',
   'notes',
   'status',
 ]

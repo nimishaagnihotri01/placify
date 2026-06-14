@@ -22,7 +22,7 @@ const indicatorClasses = {
   },
   Normal: {
     card: 'border-slate-200 bg-white',
-    icon: 'bg-teal-50 text-teal-800',
+    icon: 'bg-indigo-50 text-indigo-700',
     badge: 'bg-slate-100 text-slate-700',
     label: 'text-slate-500',
     Icon: CalendarCheck,
@@ -42,7 +42,9 @@ export default function ReminderCard({ reminder }) {
   const Icon = classes.Icon
 
   return (
-    <article className={`rounded-lg border p-4 ${classes.card}`}>
+    <article
+      className={`rounded-lg border p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${classes.card}`}
+    >
       <div className="flex items-start gap-3">
         <span
           className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg ${classes.icon}`}

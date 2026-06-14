@@ -20,13 +20,13 @@ export default function NotificationSettings({
     permission === NOTIFICATION_PERMISSION.unsupported
 
   return (
-    <section className="mt-6 rounded-lg border border-slate-200 bg-white px-5 py-4 shadow-sm">
+    <section className="mt-6 rounded-lg border border-slate-200 bg-white px-5 py-4 shadow-sm shadow-slate-200/60">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
           <span
             className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg ${
               isEnabled
-                ? 'bg-teal-50 text-teal-800'
+                ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100'
                 : 'bg-slate-100 text-slate-500'
             }`}
           >
@@ -48,8 +48,8 @@ export default function NotificationSettings({
 
         <button
           aria-checked={isEnabled}
-          className={`flex h-9 w-16 shrink-0 items-center rounded-full p-1 transition focus:outline-none focus:ring-2 focus:ring-teal-700 focus:ring-offset-2 ${
-            isEnabled ? 'bg-teal-700' : 'bg-slate-200'
+          className={`flex h-9 w-16 shrink-0 items-center rounded-full p-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
+            isEnabled ? 'bg-indigo-600' : 'bg-slate-200'
           }`}
           disabled={isUpdating || permission === NOTIFICATION_PERMISSION.unsupported}
           onClick={onToggle}

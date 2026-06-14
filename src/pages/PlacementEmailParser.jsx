@@ -8,6 +8,7 @@ import {
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/common/Button.jsx'
+import Card from '../components/common/Card.jsx'
 import PageHeader from '../components/dashboard/PageHeader.jsx'
 import { DEFAULT_DRIVE_STATUS } from '../constants/driveStatus.js'
 import { createDrive } from '../services/driveService.js'
@@ -24,6 +25,7 @@ const emptyForm = {
   interviewDate: '',
   eligibilityCriteria: '',
   packageCtc: '',
+  location: '',
   notes: '',
 }
 
@@ -73,6 +75,12 @@ const previewFields = [
     placeholder: 'No package found',
   },
   {
+    id: 'location',
+    label: 'Location',
+    type: 'text',
+    placeholder: 'No location found',
+  },
+  {
     id: 'eligibilityCriteria',
     label: 'Eligibility Criteria',
     type: 'textarea',
@@ -98,7 +106,7 @@ function getFieldInputClass(hasError) {
 
   return hasError
     ? `${baseClass} border-rose-300 focus:border-rose-500 focus:ring-rose-100`
-    : `${baseClass} border-slate-200 focus:border-teal-600 focus:ring-teal-100`
+    : `${baseClass} border-slate-200 focus:border-indigo-500 focus:ring-indigo-100`
 }
 
 function buildExtractionForm(extractedFields) {
@@ -186,6 +194,7 @@ export default function PlacementEmailParser() {
         interviewDate: form.interviewDate || undefined,
         eligibilityCriteria: form.eligibilityCriteria || undefined,
         packageCtc: form.packageCtc || undefined,
+        location: form.location || undefined,
         notes: form.notes || undefined,
       })
 
@@ -206,7 +215,7 @@ export default function PlacementEmailParser() {
       />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <Card className="p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-lg font-bold tracking-normal text-slate-950">
@@ -216,7 +225,7 @@ export default function PlacementEmailParser() {
                 Parsing runs entirely in the browser with no paid or external AI APIs.
               </p>
             </div>
-            <span className="inline-flex w-fit items-center gap-2 rounded-lg bg-teal-50 px-3 py-2 text-xs font-bold uppercase tracking-[0.12em] text-teal-800">
+            <span className="inline-flex w-fit items-center gap-2 rounded-lg bg-indigo-50 px-3 py-2 text-xs font-bold uppercase tracking-[0.12em] text-indigo-700 ring-1 ring-indigo-100">
               <Sparkles size={15} aria-hidden="true" />
               Rule based
             </span>
@@ -225,7 +234,7 @@ export default function PlacementEmailParser() {
           <label className="mt-5 block">
             <span className="sr-only">Paste email content</span>
             <textarea
-              className="min-h-[360px] w-full resize-y rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:bg-white focus:ring-4 focus:ring-teal-100"
+              className="min-h-[360px] w-full resize-y rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
               onChange={(event) => setEmailContent(event.target.value)}
               placeholder="Paste placement email content here..."
               value={emailContent}
@@ -258,11 +267,11 @@ export default function PlacementEmailParser() {
               Reset
             </Button>
           </div>
-        </section>
+        </Card>
 
-        <aside className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <Card as="aside" className="p-5">
           <div className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-cyan-50 text-cyan-800">
+            <span className="grid h-9 w-9 place-items-center rounded-lg bg-sky-50 text-sky-700 ring-1 ring-sky-100">
               <ClipboardPaste size={18} aria-hidden="true" />
             </span>
             <h2 className="text-lg font-bold tracking-normal text-slate-950">
@@ -273,7 +282,7 @@ export default function PlacementEmailParser() {
             {SAMPLE_PLACEMENT_EMAILS.map((sample) => (
               <button
                 key={sample.title}
-                className="w-full rounded-lg border border-slate-200 bg-white p-4 text-left transition hover:border-teal-200 hover:bg-teal-50"
+                className="w-full rounded-lg border border-slate-200 bg-white p-4 text-left transition hover:border-indigo-200 hover:bg-indigo-50"
                 onClick={() => loadSample(sample)}
                 type="button"
               >
@@ -286,11 +295,11 @@ export default function PlacementEmailParser() {
               </button>
             ))}
           </div>
-        </aside>
+        </Card>
       </div>
 
       <form onSubmit={handleCreateDrive} className="mt-6">
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <Card className="p-5 sm:p-6">
           <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-lg font-bold tracking-normal text-slate-950">
@@ -381,7 +390,7 @@ export default function PlacementEmailParser() {
               </p>
             )}
           </div>
-        </section>
+        </Card>
       </form>
     </>
   )

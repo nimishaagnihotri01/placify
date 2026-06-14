@@ -4,6 +4,7 @@ import express from 'express'
 import { connectDB } from './config/db.js'
 import { errorHandler, notFound } from './middleware/errorMiddleware.js'
 import driveRoutes from './routes/driveRoutes.js'
+import gmailRoutes from './routes/gmailRoutes.js'
 
 dotenv.config()
 
@@ -26,6 +27,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/drives', driveRoutes)
+app.use('/api/gmail', gmailRoutes)
 
 app.use(notFound)
 app.use(errorHandler)

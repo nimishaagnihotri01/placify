@@ -1,3 +1,4 @@
+import Card from '../components/common/Card.jsx'
 import PageHeader from '../components/dashboard/PageHeader.jsx'
 import { calendarEvents } from '../data/placementDrives.js'
 
@@ -19,7 +20,7 @@ export default function Calendar() {
       />
 
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <Card className="p-4 sm:p-5">
           <div className="flex items-center justify-between border-b border-slate-200 pb-4">
             <div>
               <h2 className="text-xl font-bold tracking-normal text-slate-950">
@@ -27,12 +28,12 @@ export default function Calendar() {
               </h2>
               <p className="text-sm text-slate-500">Placement events preview</p>
             </div>
-            <span className="rounded-lg bg-teal-50 px-3 py-2 text-sm font-bold text-teal-800">
+            <span className="rounded-lg bg-indigo-50 px-3 py-2 text-sm font-bold text-indigo-700 ring-1 ring-indigo-100">
               4 events
             </span>
           </div>
 
-          <div className="mt-5 grid grid-cols-7 gap-2 text-center text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+          <div className="mt-5 grid grid-cols-7 gap-1 text-center text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 sm:gap-2 sm:text-xs">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
               <div key={day} className="py-2">
                 {day}
@@ -40,22 +41,22 @@ export default function Calendar() {
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-1 sm:gap-2">
             {days.map((day) => {
               const eventType = highlightedDays[day]
 
               return (
                 <div
                   key={day}
-                  className={`flex min-h-20 flex-col rounded-lg border p-2 text-sm ${
+                  className={`flex min-h-16 flex-col rounded-lg border p-1.5 text-xs transition sm:min-h-20 sm:p-2 sm:text-sm ${
                     eventType
-                      ? 'border-teal-200 bg-teal-50 text-teal-950'
+                      ? 'border-indigo-200 bg-indigo-50 text-indigo-950 shadow-sm'
                       : 'border-slate-200 bg-white text-slate-600'
                   }`}
                 >
                   <span className="font-bold">{day}</span>
                   {eventType && (
-                    <span className="mt-auto rounded-md bg-white px-2 py-1 text-xs font-bold text-teal-800">
+                    <span className="mt-auto truncate rounded-md bg-white px-1.5 py-1 text-[10px] font-bold text-indigo-700 ring-1 ring-indigo-100 sm:px-2 sm:text-xs">
                       {eventType}
                     </span>
                   )}
@@ -63,9 +64,9 @@ export default function Calendar() {
               )
             })}
           </div>
-        </section>
+        </Card>
 
-        <aside className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <Card as="aside" className="p-5">
           <h2 className="text-xl font-bold tracking-normal text-slate-950">
             Sample Events
           </h2>
@@ -73,7 +74,7 @@ export default function Calendar() {
             {calendarEvents.map((event) => (
               <article
                 key={event.id}
-                className="flex gap-3 rounded-lg border border-slate-200 p-4"
+                className="flex gap-3 rounded-lg border border-slate-200 p-4 transition hover:border-indigo-200 hover:bg-indigo-50/50"
               >
                 <span
                   className={`mt-1 h-3 w-3 shrink-0 rounded-full ${event.accent}`}
@@ -89,7 +90,7 @@ export default function Calendar() {
               </article>
             ))}
           </div>
-        </aside>
+        </Card>
       </div>
     </>
   )
